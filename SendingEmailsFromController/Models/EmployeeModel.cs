@@ -9,7 +9,7 @@ namespace SendingEmailsFromController.Models
     public class EmployeeModel
     {
         [DataType(DataType.EmailAddress), Display(Name = "Do")]
-        [Required]
+        [Required(ErrorMessage ="Proszę podać adres e-mail")]
         public string ToEmail { get; set; }
         [Display(Name = "Temat")]
         public string EmailSubject { get; set; }
