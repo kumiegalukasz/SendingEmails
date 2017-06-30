@@ -1,6 +1,7 @@
 ﻿using SendingEmailsFromController.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
@@ -18,35 +19,43 @@ namespace SendingEmailsFromController.Controllers
             return View();
         }
         [HttpPost]
-        public ActionResult SendEmail(EmployeeModel obj)
+        public ActionResult SendEmail(EmployeeModel obj, List<HttpPostedFileBase> attachments)
         {
             if (ModelState.IsValid)
             {
-            try
-            {
-                SmtpClient smtpClient = new SmtpClient("poczta.o2.pl", 587);
-                smtpClient.UseDefaultCredentials = false;
-                 smtpClient.Credentials = new NetworkCredential(obj.Email, obj.Password);
-                MailMessage message = new MailMessage();
-                message.To.Add(new MailAddress(obj.ToEmail));
-                message.From = new MailAddress(obj.Email);
-                message.Body = obj.EMailBody;
-                message.Subject = obj.EmailSubject;
-                if (obj.EmailCC!=null)
+                try
                 {
-                    message.CC.Add(new MailAddress(obj.EmailCC));
+                    SmtpClient smtpClient = new SmtpClient("poczta.o2.pl", 587);
+                    smtpClient.UseDefaultCredentials = false;
+                    smtpClient.Credentials = new NetworkCredential(obj.Email, obj.Password);
+                    MailMessage message = new MailMessage();
+                    foreach (HttpPostedFileBase attachment in attachments)
+                    {
+                        if (attachment != null)
+                        {
+                            string fileName = Path.GetFileName(attachment.FileName);
+                            message.Attachments.Add(new Attachment(attachment.InputStream, fileName));
+                        }
+                    }
+                    message.To.Add(new MailAddress(obj.ToEmail));
+                    message.From = new MailAddress(obj.Email);
+                    message.Body = obj.EMailBody;
+                    message.Subject = obj.EmailSubject;
+                    if (obj.EmailCC != null)
+                    {
+                        message.CC.Add(new MailAddress(obj.EmailCC));
+                    }
+
+                    //Attachment data = new Attachment();
+                    //message.Attachments.Add(data);
+
+                    smtpClient.Send(message);
                 }
-
-                //Attachment data = new Attachment();
-                //message.Attachments.Add(data);
-
-                smtpClient.Send(message);
-            }
-            catch (Exception)
-            {
-                ViewBag.Status = "Problem while sending email, Please check details.";
-                throw;
-            }
+                catch (Exception)
+                {
+                    ViewBag.Status = "Problem while sending email, Please check details.";
+                    throw;
+                }
 
                 return View("Wyslano", obj);
             }
@@ -54,7 +63,7 @@ namespace SendingEmailsFromController.Controllers
             {
                 return View("SendEmail");
             }
-            
+
         }
         public ActionResult Wyslano()
         {
