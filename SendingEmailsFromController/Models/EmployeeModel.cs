@@ -21,7 +21,7 @@ namespace SendingEmailsFromController.Models
         [Display(Name = "Kopia")]
         public string EmailCC { get; set; }
 
-        [Display(Name = "Login")]
+        [Display(Name = "Twój e-mail")]
         [Required(ErrorMessage = "Proszę podać login")]
         public string Email { get; set; }
 

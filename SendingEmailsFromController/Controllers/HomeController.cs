@@ -29,7 +29,7 @@ namespace SendingEmailsFromController.Controllers
                  smtpClient.Credentials = new NetworkCredential(obj.Email, obj.Password);
                 MailMessage message = new MailMessage();
                 message.To.Add(new MailAddress(obj.ToEmail));
-                message.From = new MailAddress("kumiega86@tlen.pl");
+                message.From = new MailAddress(obj.Email);
                 message.Body = obj.EMailBody;
                 message.Subject = obj.EmailSubject;
                 if (obj.EmailCC!=null)
